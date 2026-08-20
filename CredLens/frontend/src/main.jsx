@@ -4,16 +4,25 @@ import "./styles.css";
 
 const DEMO_ID = 100002;
 
-// --------------------------------------------------------
-// Fixed demo personas (Section 30a of the plan).
-// Fill in personB / personC applicant IDs once identified
-// from your own data exploration — do not browse live on
-// stage. 100002 is confirmed to return DECLINE.
-// --------------------------------------------------------
 const PERSONAS = [
-  { label: "Thin-file / good", id: 100044, hint: "confirmed APPROVE" },
-  { label: "Deteriorating", id: 100002, hint: "confirmed DECLINE" },
-  { label: "Suspicious", id: 100082, hint: "confirmed UNUSUAL / REFER" },
+  {
+    label: "Thin-file / good",
+    id: 100044,
+    expected: "APPROVE",
+    desc: "Low risk, high evidence confidence, no integrity flag.",
+  },
+  {
+    label: "Deteriorating",
+    id: 100002,
+    expected: "DECLINE",
+    desc: "Recent payment timing trending later than history.",
+  },
+  {
+    label: "Suspicious",
+    id: 100082,
+    expected: "REFER",
+    desc: "Moderate risk, but flagged UNUSUAL by the integrity layer.",
+  },
 ];
 
 const DECISION_COLOR = {
@@ -22,21 +31,36 @@ const DECISION_COLOR = {
   DECLINE: "var(--coral)",
 };
 
+const TABS = ["Overview", "Risk Journey", "Why?", "Audit Trail"];
+
+const LIMITATIONS = [
+  "Trained on public anonymized historical data",
+  "Not trained on Indian Account Aggregator data",
+  "Anomaly layer is unsupervised — no fraud ground truth exists",
+  "Confidence is a documented heuristic, not statistically calibrated",
+  "Production deployment would require regulatory/fairness validation",
+  "Human review remains necessary for REFER cases",
+];
+
 function App() {
   const [id, setId] = useState(DEMO_ID);
   const [decision, setDecision] = useState(null);
-  const [prevDecision, setPrevDecision] = useState(null);
+  const [beforeState, setBeforeState] = useState(null);
+  const [event, setEvent] = useState(null);
   const [timeline, setTimeline] = useState(null);
   const [factors, setFactors] = useState([]);
   const [modelFactors, setModelFactors] = useState(null);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [tab, setTab] = useState("Overview");
 
   async function loadApplicant(applicantId) {
     const targetId = applicantId ?? id;
     if (!targetId) return;
     setLoading(true);
-    setPrevDecision(null);
+    setBeforeState(null);
+    setEvent(null);
+    setTab("Overview");
     try {
       const res = await fetch("/api/v1/decision", {
         method: "POST",
@@ -67,20 +91,22 @@ function App() {
 
   async function simulateBehavior() {
     setUpdating(true);
-    setPrevDecision(decision);
+    setBeforeState(decision);
+    const payload = {
+      timestamp: new Date().toISOString(),
+      paymentAmount: 8000,
+      scheduledAmount: 12000,
+      balance: 84000,
+      daysPastDue: 7,
+    };
+    setEvent(payload);
     try {
       const res = await fetch(
         `http://localhost:8001/api/v1/applicants/${id}/behavior/update`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            paymentAmount: 8000,
-            scheduledAmount: 12000,
-            balance: 84000,
-            daysPastDue: 7,
-          }),
+          body: JSON.stringify(payload),
         }
       );
       setDecision(await res.json());
@@ -151,27 +177,43 @@ function App() {
               />
             </div>
           )}
+
+          <div className="railLabel small">Prototype limitations</div>
+          <ul className="limitList">
+            {LIMITATIONS.map((l, i) => (
+              <li key={i}>{l}</li>
+            ))}
+          </ul>
         </aside>
 
         <main>
+          <section className="personaGrid">
+            {PERSONAS.map((p) => (
+              <button
+                key={p.label}
+                className={`personaCard ${id === p.id ? "active" : ""}`}
+                disabled={loading}
+                onClick={() => {
+                  setId(p.id);
+                  loadApplicant(p.id);
+                }}
+              >
+                <div className="personaHead">
+                  <span className="personaName">{p.label}</span>
+                  <span
+                    className="personaOutcome"
+                    style={{ color: DECISION_COLOR[p.expected] }}
+                  >
+                    {p.expected}
+                  </span>
+                </div>
+                <p>{p.desc}</p>
+                <span className="personaId">#{p.id}</span>
+              </button>
+            ))}
+          </section>
+
           <section className="toolbar">
-            <div className="personas">
-              {PERSONAS.map((p) => (
-                <button
-                  key={p.label}
-                  className="personaChip"
-                  disabled={!p.id || loading}
-                  title={p.hint}
-                  onClick={() => {
-                    setId(p.id);
-                    loadApplicant(p.id);
-                  }}
-                >
-                  {p.label}
-                  {!p.id && <span className="chipTodo">TBD</span>}
-                </button>
-              ))}
-            </div>
             <div className="manual">
               <label>Applicant ID</label>
               <input value={id} onChange={(e) => setId(e.target.value)} />
@@ -209,63 +251,66 @@ function App() {
                 />
               </section>
 
-              {prevDecision && (
-                <section className="deltaBanner">
-                  <span className="deltaLabel">Live behavioral event applied</span>
-                  <span className="deltaRow">
-                    Risk{" "}
-                    <s>{Math.round(prevDecision.riskScore * 100)}%</s>
-                    <span className="arrow">→</span>
-                    <b style={{ color: decisionColor }}>{riskPct}%</b>
-                  </span>
-                  <span className="deltaRow">
-                    Decision{" "}
-                    <s>{prevDecision.decision}</s>
-                    <span className="arrow">→</span>
-                    <b style={{ color: decisionColor }}>{decision.decision}</b>
-                  </span>
+              <nav className="tabs">
+                {TABS.map((t) => (
+                  <button
+                    key={t}
+                    className={`tabBtn ${tab === t ? "active" : ""}`}
+                    onClick={() => setTab(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </nav>
+
+              {tab === "Overview" && (
+                <section className="panel liveUpdate">
+                  <div className="panelHead">
+                    <h2>Live behavioral update</h2>
+                    <span className={`badge ${isLive ? "live" : "muted"}`}>
+                      <i className="dot" /> {isLive ? "LIVE" : "READY"}
+                    </span>
+                  </div>
+                  <p>
+                    Simulate a new payment-delay event arriving for this applicant
+                    and recompute their state through the real M5 model — end to
+                    end, live. No Kafka/Kinesis required for the prototype.
+                  </p>
+                  <button
+                    className="primaryBtn"
+                    onClick={simulateBehavior}
+                    disabled={updating}
+                  >
+                    {updating ? "Recomputing…" : "Receive new behavioral event"}
+                  </button>
+
+                  {beforeState && event && (
+                    <div className="diffGrid">
+                      <div className="diffCol">
+                        <span className="diffLabel">Before event</span>
+                        <DiffRow label="Risk" value={`${Math.round(beforeState.riskScore * 100)}%`} />
+                        <DiffRow label="Confidence" value={`${Math.round(beforeState.confidence)}%`} />
+                        <DiffRow label="Decision" value={beforeState.decision} />
+                      </div>
+                      <div className="diffCol diffEvent">
+                        <span className="diffLabel">New event</span>
+                        <DiffRow label="Payment" value={`₹${event.paymentAmount.toLocaleString()}`} />
+                        <DiffRow label="Scheduled" value={`₹${event.scheduledAmount.toLocaleString()}`} />
+                        <DiffRow label="Days past due" value={event.daysPastDue} />
+                      </div>
+                      <div className="diffCol diffAfter">
+                        <span className="diffLabel">After event</span>
+                        <DiffRow label="Risk" value={`${riskPct}%`} highlight={decisionColor} />
+                        <DiffRow label="Confidence" value={`${confPct}%`} />
+                        <DiffRow label="Decision" value={decision.decision} highlight={decisionColor} />
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
-              <section className="two">
-                <div className="panel">
-                  <div className="panelHead">
-                    <h2>Why?</h2>
-                  </div>
-
-                  {modelFactors && (
-                    <div className="factorGroup">
-                      <div className="factorGroupLabel">
-                        SHAP · {modelFactors.model}
-                      </div>
-                      {modelFactors.topRiskFactors?.slice(0, 3).map((f, i) => (
-                        <FactorRow
-                          key={`r${i}`}
-                          text={`${f.label}: ${f.displayValue}`}
-                          direction="INCREASED_RISK"
-                        />
-                      ))}
-                      {modelFactors.topProtectiveFactors
-                        ?.slice(0, 3)
-                        .map((f, i) => (
-                          <FactorRow
-                            key={`p${i}`}
-                            text={`${f.label}: ${f.displayValue}`}
-                            direction="REDUCED_RISK"
-                          />
-                        ))}
-                    </div>
-                  )}
-
-                  <div className="factorGroup">
-                    <div className="factorGroupLabel">Contextual evidence</div>
-                    {factors.map((f, i) => (
-                      <FactorRow key={i} text={f.factor} direction={f.direction} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="panel">
+              {tab === "Risk Journey" && (
+                <section className="panel">
                   <div className="panelHead">
                     <h2>Risk Journey</h2>
                     <span className="badge muted">
@@ -299,33 +344,81 @@ function App() {
                       Trend: <b>{timeline.behaviorTrend}</b>
                     </div>
                   )}
-                </div>
-              </section>
+                </section>
+              )}
 
-              <section className="panel liveUpdate">
-                <div className="panelHead">
-                  <h2>Live behavioral update</h2>
-                  <span className={`badge ${isLive ? "live" : "muted"}`}>
-                    <i className="dot" /> {isLive ? "LIVE" : "READY"}
-                  </span>
-                </div>
-                <p>
-                  Simulate a new payment-delay event arriving for this applicant and
-                  recompute their state through the real M5 model — end to end, live.
-                  No Kafka/Kinesis required for the prototype.
-                </p>
-                <button
-                  className="primaryBtn"
-                  onClick={simulateBehavior}
-                  disabled={updating}
-                >
-                  {updating ? "Recomputing…" : "Receive new behavioral event"}
-                </button>
-              </section>
+              {tab === "Why?" && (
+                <section className="panel">
+                  <div className="panelHead">
+                    <h2>Why?</h2>
+                  </div>
+                  {modelFactors && (
+                    <div className="factorGroup">
+                      <div className="factorGroupLabel">
+                        SHAP · {modelFactors.model}
+                      </div>
+                      {modelFactors.topRiskFactors?.slice(0, 3).map((f, i) => (
+                        <FactorRow
+                          key={`r${i}`}
+                          text={`${f.label}: ${f.displayValue}`}
+                          direction="INCREASED_RISK"
+                        />
+                      ))}
+                      {modelFactors.topProtectiveFactors
+                        ?.slice(0, 3)
+                        .map((f, i) => (
+                          <FactorRow
+                            key={`p${i}`}
+                            text={`${f.label}: ${f.displayValue}`}
+                            direction="REDUCED_RISK"
+                          />
+                        ))}
+                    </div>
+                  )}
+                  <div className="factorGroup">
+                    <div className="factorGroupLabel">Contextual evidence</div>
+                    {factors.map((f, i) => (
+                      <FactorRow key={i} text={f.factor} direction={f.direction} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {tab === "Audit Trail" && (
+                <section className="panel">
+                  <div className="panelHead">
+                    <h2>Decision Audit Trail</h2>
+                  </div>
+                  <div className="auditGrid">
+                    <RailRow label="Applicant" value={`#${decision.applicantId}`} />
+                    <RailRow label="Risk model" value={decision.modelVersion} />
+                    <RailRow label="Policy" value={decision.policyVersion} />
+                    <RailRow label="Mode" value={decision.mode} />
+                    <RailRow label="Risk" value={`${riskPct}%`} />
+                    <RailRow label="Confidence" value={`${confPct}%`} />
+                    <RailRow label="Integrity" value={decision.integrityStatus} />
+                    <RailRow label="Decision" value={decision.decision} />
+                  </div>
+                  <p className="auditNote">
+                    Decision ID and persisted timestamp are assigned once every
+                    decision is written to PostgreSQL (next task) — this trail
+                    currently reflects live inference only.
+                  </p>
+                </section>
+              )}
             </>
           )}
         </main>
       </div>
+    </div>
+  );
+}
+
+function DiffRow({ label, value, highlight }) {
+  return (
+    <div className="diffRow">
+      <span>{label}</span>
+      <b style={highlight ? { color: highlight } : undefined}>{value}</b>
     </div>
   );
 }
@@ -379,11 +472,7 @@ function RiskGauge({ value, color }) {
           cy="60"
           r={r}
           className="gaugeFill"
-          style={{
-            stroke: color,
-            strokeDasharray: c,
-            strokeDashoffset: offset,
-          }}
+          style={{ stroke: color, strokeDasharray: c, strokeDashoffset: offset }}
         />
       </svg>
       <strong className="gaugeValue">{value}%</strong>
@@ -405,11 +494,7 @@ function ConfidenceRing({ value }) {
           cy="60"
           r={r}
           className="gaugeFill"
-          style={{
-            stroke: "var(--gold)",
-            strokeDasharray: c,
-            strokeDashoffset: offset,
-          }}
+          style={{ stroke: "var(--gold)", strokeDasharray: c, strokeDashoffset: offset }}
         />
       </svg>
       <strong className="gaugeValue">{value}%</strong>
@@ -440,15 +525,6 @@ function BeforeAfter() {
         <div className="baLine">Decision <b>REFER</b></div>
         <div className="baLine">Explanation <b>Available</b></div>
       </div>
-    </div>
-  );
-}
-
-function Card({ title, value }) {
-  return (
-    <div className="card">
-      <span>{title}</span>
-      <strong>{value}</strong>
     </div>
   );
 }
