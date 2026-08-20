@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: credlens-postgres
+    environment:
+      POSTGRES_DB: credlens
+      POSTGRES_USER: credlens
+      POSTGRES_PASSWORD: credlens_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - credlens_pgdata:/var/lib/postgresql/data
+
+volumes:
+  credlens_pgdata:

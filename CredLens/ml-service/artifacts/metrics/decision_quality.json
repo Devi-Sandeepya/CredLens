@@ -1,0 +1,109 @@
+{
+  "model": "m5-risk-model-v1",
+  "evaluationProtocol": {
+    "type": "TRUE_HOLDOUT",
+    "trainingApplicants": 24000,
+    "holdoutApplicants": 6000,
+    "predictionsSource": "C:\\Users\\devis\\Downloads\\CredLens_project\\CredLens\\ml-service\\artifacts\\metrics\\m5_holdout_predictions.parquet",
+    "predictionColumn": "risk_probability",
+    "predictionGeneration": "Predictions generated during training on the untouched 20% holdout.",
+    "fullCohortPredictionUsed": false,
+    "leakageCheck": {
+      "predictionSource": "saved_training_holdout_artifact",
+      "predictionsRegeneratedDuringEvaluation": false,
+      "targetConsistencyValidated": true,
+      "uniqueApplicantAlignmentValidated": true
+    }
+  },
+  "dataset": {
+    "applicants": 6000,
+    "defaults": 481,
+    "defaultRate": 0.080167
+  },
+  "metrics": {
+    "rocAuc": 0.726811,
+    "prAuc": 0.225231,
+    "brier": 0.138175
+  },
+  "approvalQuality": [
+    {
+      "targetApprovalRate": 0.7,
+      "actualApprovedCount": 4200,
+      "actualApprovalRate": 0.7,
+      "approvedDefaultRate": 0.0452,
+      "approvedDefaults": 190
+    },
+    {
+      "targetApprovalRate": 0.8,
+      "actualApprovedCount": 4800,
+      "actualApprovalRate": 0.8,
+      "approvedDefaultRate": 0.0515,
+      "approvedDefaults": 247
+    },
+    {
+      "targetApprovalRate": 0.9,
+      "actualApprovedCount": 5400,
+      "actualApprovalRate": 0.9,
+      "approvedDefaultRate": 0.0585,
+      "approvedDefaults": 316
+    }
+  ],
+  "riskCapture": [
+    {
+      "threshold": 0.391222,
+      "highRiskApplicants": 1800,
+      "capturedDefaults": 291,
+      "totalDefaults": 481,
+      "defaultCaptureRate": 0.605
+    },
+    {
+      "threshold": 0.48749,
+      "highRiskApplicants": 1200,
+      "capturedDefaults": 234,
+      "totalDefaults": 481,
+      "defaultCaptureRate": 0.4865
+    },
+    {
+      "threshold": 0.629683,
+      "highRiskApplicants": 600,
+      "capturedDefaults": 165,
+      "totalDefaults": 481,
+      "defaultCaptureRate": 0.343
+    }
+  ],
+  "policyDistribution": {
+    "APPROVE": {
+      "count": 1609,
+      "rate": 0.2682
+    },
+    "REFER": {
+      "count": 3951,
+      "rate": 0.6585
+    },
+    "DECLINE": {
+      "count": 440,
+      "rate": 0.0733
+    }
+  },
+  "integrityDistribution": {
+    "available": true,
+    "NORMAL": 5823,
+    "UNUSUAL": 177,
+    "unusualRate": 0.0295
+  },
+  "confusionMatrix": {
+    "threshold": 0.5,
+    "TN": 4611,
+    "FP": 908,
+    "FN": 249,
+    "TP": 232
+  },
+  "featureGroups": {
+    "total": 52,
+    "applicant": 14,
+    "bureau": 11,
+    "repayment": 8,
+    "previousApplications": 7,
+    "temporal": 7
+  }
+}

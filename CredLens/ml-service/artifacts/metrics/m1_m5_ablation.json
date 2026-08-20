@@ -1,0 +1,277 @@
+[
+  {
+    "model": "M1",
+    "feature_count": 20,
+    "train_rows": 24000,
+    "holdout_rows": 6000,
+    "train_default_count": 1922,
+    "holdout_default_count": 481,
+    "roc_auc": 0.7116432780502359,
+    "pr_auc": 0.20404944526164417,
+    "brier_score": 0.15465883693458934,
+    "calibration": {
+      "fraction_of_positives": [
+        0.02,
+        0.03166666666666667,
+        0.03333333333333333,
+        0.05,
+        0.051666666666666666,
+        0.08,
+        0.07333333333333333,
+        0.08833333333333333,
+        0.12,
+        0.25333333333333335
+      ],
+      "mean_predicted_value": [
+        0.038521058116494304,
+        0.08904922500121541,
+        0.1392085606311327,
+        0.19715240398596387,
+        0.260054223575447,
+        0.3231326180551673,
+        0.3901589777257557,
+        0.472136863340941,
+        0.5873426474910469,
+        0.7476153123774865
+      ]
+    },
+    "fixed_approval_70": {
+      "approval_rate": 0.7,
+      "approved_default_rate": 0.04857142857142857,
+      "rejected_default_rate": 0.15388888888888888,
+      "approved_default_capture": 0.42411642411642414
+    },
+    "fixed_approval_80": {
+      "approval_rate": 0.8,
+      "approved_default_rate": 0.05354166666666667,
+      "rejected_default_rate": 0.18666666666666668,
+      "approved_default_capture": 0.5343035343035343
+    },
+    "fixed_approval_90": {
+      "approval_rate": 0.9,
+      "approved_default_rate": 0.060925925925925925,
+      "rejected_default_rate": 0.25333333333333335,
+      "approved_default_capture": 0.683991683991684
+    }
+  },
+  {
+    "model": "M2",
+    "feature_count": 31,
+    "train_rows": 24000,
+    "holdout_rows": 6000,
+    "train_default_count": 1922,
+    "holdout_default_count": 481,
+    "roc_auc": 0.7104649634093374,
+    "pr_auc": 0.20966662037298595,
+    "brier_score": 0.14949695131816684,
+    "calibration": {
+      "fraction_of_positives": [
+        0.028333333333333332,
+        0.03333333333333333,
+        0.03666666666666667,
+        0.04833333333333333,
+        0.045,
+        0.058333333333333334,
+        0.07666666666666666,
+        0.09,
+        0.14666666666666667,
+        0.23833333333333334
+      ],
+      "mean_predicted_value": [
+        0.041138394127320524,
+        0.09370362748553254,
+        0.14149056805161986,
+        0.1940623004673541,
+        0.25208435299356274,
+        0.3110100085045025,
+        0.3780649125382715,
+        0.4588249290775671,
+        0.5738395572971,
+        0.7368352063666083
+      ]
+    },
+    "fixed_approval_70": {
+      "approval_rate": 0.7,
+      "approved_default_rate": 0.04666666666666667,
+      "rejected_default_rate": 0.15833333333333333,
+      "approved_default_capture": 0.4074844074844075
+    },
+    "fixed_approval_80": {
+      "approval_rate": 0.8,
+      "approved_default_rate": 0.052083333333333336,
+      "rejected_default_rate": 0.1925,
+      "approved_default_capture": 0.5197505197505198
+    },
+    "fixed_approval_90": {
+      "approval_rate": 0.9,
+      "approved_default_rate": 0.06259259259259259,
+      "rejected_default_rate": 0.23833333333333334,
+      "approved_default_capture": 0.7027027027027027
+    }
+  },
+  {
+    "model": "M3",
+    "feature_count": 38,
+    "train_rows": 24000,
+    "holdout_rows": 6000,
+    "train_default_count": 1922,
+    "holdout_default_count": 481,
+    "roc_auc": 0.7200184281177215,
+    "pr_auc": 0.21781261430927779,
+    "brier_score": 0.14458848447693928,
+    "calibration": {
+      "fraction_of_positives": [
+        0.02666666666666667,
+        0.028333333333333332,
+        0.04,
+        0.03666666666666667,
+        0.06333333333333334,
+        0.06166666666666667,
+        0.06333333333333334,
+        0.09333333333333334,
+        0.13833333333333334,
+        0.25
+      ],
+      "mean_predicted_value": [
+        0.0406961304908579,
+        0.0875099336782846,
+        0.1322864832654889,
+        0.18098222968956457,
+        0.23658709473818523,
+        0.2984691315854071,
+        0.3684244464450503,
+        0.45268854321728924,
+        0.567208547998414,
+        0.7351670132893748
+      ]
+    },
+    "fixed_approval_70": {
+      "approval_rate": 0.7,
+      "approved_default_rate": 0.045714285714285714,
+      "rejected_default_rate": 0.16055555555555556,
+      "approved_default_capture": 0.3991683991683992
+    },
+    "fixed_approval_80": {
+      "approval_rate": 0.8,
+      "approved_default_rate": 0.051666666666666666,
+      "rejected_default_rate": 0.19416666666666665,
+      "approved_default_capture": 0.5155925155925156
+    },
+    "fixed_approval_90": {
+      "approval_rate": 0.9,
+      "approved_default_rate": 0.06129629629629629,
+      "rejected_default_rate": 0.25,
+      "approved_default_capture": 0.6881496881496881
+    }
+  },
+  {
+    "model": "M4",
+    "feature_count": 45,
+    "train_rows": 24000,
+    "holdout_rows": 6000,
+    "train_default_count": 1922,
+    "holdout_default_count": 481,
+    "roc_auc": 0.7221931117564385,
+    "pr_auc": 0.21491979465418778,
+    "brier_score": 0.14076835609246033,
+    "calibration": {
+      "fraction_of_positives": [
+        0.02,
+        0.035,
+        0.043333333333333335,
+        0.03333333333333333,
+        0.04666666666666667,
+        0.07166666666666667,
+        0.07333333333333333,
+        0.09333333333333334,
+        0.12,
+        0.265
+      ],
+      "mean_predicted_value": [
+        0.0381524447319564,
+        0.08537448063189232,
+        0.12955613365058397,
+        0.17580316378630756,
+        0.22916961525861435,
+        0.2869067302825585,
+        0.35749722177211757,
+        0.4414511557387643,
+        0.5601984421296705,
+        0.7286696450918718
+      ]
+    },
+    "fixed_approval_70": {
+      "approval_rate": 0.7,
+      "approved_default_rate": 0.04619047619047619,
+      "rejected_default_rate": 0.15944444444444444,
+      "approved_default_capture": 0.40332640332640335
+    },
+    "fixed_approval_80": {
+      "approval_rate": 0.8,
+      "approved_default_rate": 0.052083333333333336,
+      "rejected_default_rate": 0.1925,
+      "approved_default_capture": 0.5197505197505198
+    },
+    "fixed_approval_90": {
+      "approval_rate": 0.9,
+      "approved_default_rate": 0.05962962962962963,
+      "rejected_default_rate": 0.265,
+      "approved_default_capture": 0.6694386694386695
+    }
+  },
+  {
+    "model": "M5",
+    "feature_count": 52,
+    "train_rows": 24000,
+    "holdout_rows": 6000,
+    "train_default_count": 1922,
+    "holdout_default_count": 481,
+    "roc_auc": 0.7268106887603173,
+    "pr_auc": 0.22523071730053615,
+    "brier_score": 0.13817480949485972,
+    "calibration": {
+      "fraction_of_positives": [
+        0.02,
+        0.035,
+        0.035,
+        0.03666666666666667,
+        0.043333333333333335,
+        0.07,
+        0.07666666666666666,
+        0.095,
+        0.115,
+        0.275
+      ],
+      "mean_predicted_value": [
+        0.03799993469572231,
+        0.08280695171818757,
+        0.12824672078055713,
+        0.17350413226325972,
+        0.22339550130399374,
+        0.2828842468880103,
+        0.3536444655372398,
+        0.435609658986315,
+        0.5540449144405926,
+        0.724493340858072
+      ]
+    },
+    "fixed_approval_70": {
+      "approval_rate": 0.7,
+      "approved_default_rate": 0.04523809523809524,
+      "rejected_default_rate": 0.16166666666666665,
+      "approved_default_capture": 0.39501039501039503
+    },
+    "fixed_approval_80": {
+      "approval_rate": 0.8,
+      "approved_default_rate": 0.051458333333333335,
+      "rejected_default_rate": 0.195,
+      "approved_default_capture": 0.5135135135135135
+    },
+    "fixed_approval_90": {
+      "approval_rate": 0.9,
+      "approved_default_rate": 0.05851851851851852,
+      "rejected_default_rate": 0.275,
+      "approved_default_capture": 0.656964656964657
+    }
+  }
+]

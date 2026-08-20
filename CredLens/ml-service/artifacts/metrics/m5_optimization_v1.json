@@ -1,0 +1,98 @@
+{
+  "experiment": "CredLens M5 Model Optimization v1",
+  "selection_method": "internal validation only",
+  "final_holdout_rows": 6000,
+  "final_holdout_used_for_selection": false,
+  "selected_model": "regularized",
+  "results": [
+    {
+      "model": "regularized",
+      "features": 52,
+      "train_rows": 19200,
+      "validation_rows": 4800,
+      "roc_auc": 0.7300005189462561,
+      "pr_auc": 0.2227518392791639,
+      "brier_score": 0.13145633084017003,
+      "selection_score": 0.32179521766139146,
+      "params": {
+        "n_estimators": 400,
+        "learning_rate": 0.035,
+        "num_leaves": 24,
+        "min_child_samples": 30,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.1,
+        "reg_lambda": 0.2,
+        "class_weight": "balanced",
+        "random_state": 42,
+        "verbosity": -1
+      }
+    },
+    {
+      "model": "conservative",
+      "features": 52,
+      "train_rows": 19200,
+      "validation_rows": 4800,
+      "roc_auc": 0.7343626160552537,
+      "pr_auc": 0.22057499586178086,
+      "brier_score": 0.1441097485208907,
+      "selection_score": 0.32000857026242197,
+      "params": {
+        "n_estimators": 500,
+        "learning_rate": 0.025,
+        "num_leaves": 20,
+        "min_child_samples": 40,
+        "subsample": 0.9,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.15,
+        "reg_lambda": 0.3,
+        "class_weight": "balanced",
+        "random_state": 42,
+        "verbosity": -1
+      }
+    },
+    {
+      "model": "baseline",
+      "features": 52,
+      "train_rows": 19200,
+      "validation_rows": 4800,
+      "roc_auc": 0.7251613451086957,
+      "pr_auc": 0.21120411035464887,
+      "brier_score": 0.12571003105371595,
+      "selection_score": 0.3148541595696082,
+      "params": {
+        "n_estimators": 300,
+        "learning_rate": 0.04,
+        "num_leaves": 31,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "class_weight": "balanced",
+        "random_state": 42,
+        "verbosity": -1
+      }
+    },
+    {
+      "model": "balanced_capacity",
+      "features": 52,
+      "train_rows": 19200,
+      "validation_rows": 4800,
+      "roc_auc": 0.7238350835975241,
+      "pr_auc": 0.19603375277786358,
+      "brier_score": 0.10762380226628632,
+      "selection_score": 0.30882551876713926,
+      "params": {
+        "n_estimators": 400,
+        "learning_rate": 0.035,
+        "num_leaves": 40,
+        "min_child_samples": 30,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.05,
+        "reg_lambda": 0.1,
+        "class_weight": "balanced",
+        "random_state": 42,
+        "verbosity": -1
+      }
+    }
+  ]
+}

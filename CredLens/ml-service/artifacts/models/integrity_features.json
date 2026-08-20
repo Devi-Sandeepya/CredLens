@@ -1,0 +1,14 @@
+[
+  "credit_to_income",
+  "annuity_to_income",
+  "employment_years",
+  "bureau_account_count",
+  "bureau_total_credit",
+  "bureau_total_debt",
+  "bureau_total_overdue",
+  "avg_payment_ratio",
+  "max_payment_delay",
+  "previous_application_count",
+  "delay_trend",
+  "on_time_trend"
+]
