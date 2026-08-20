@@ -9,3 +9,5 @@ lightgbm
 joblib
 shap
 pyarrow
+sentence-transformers
+psycopg2-binary

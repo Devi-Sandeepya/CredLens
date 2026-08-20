@@ -14,3 +14,23 @@ CREATE TABLE IF NOT EXISTS decisions (
 
 CREATE INDEX IF NOT EXISTS idx_decisions_applicant_id ON decisions(applicant_id);
 CREATE INDEX IF NOT EXISTS idx_decisions_created_at ON decisions(created_at);
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE IF NOT EXISTS policy_documents (
+    id              BIGSERIAL PRIMARY KEY,
+    title           VARCHAR(255) NOT NULL,
+    source          VARCHAR(64) NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS policy_embeddings (
+    id              BIGSERIAL PRIMARY KEY,
+    document_id     BIGINT NOT NULL REFERENCES policy_documents(id) ON DELETE CASCADE,
+    chunk_text      TEXT NOT NULL,
+    chunk_index     INT NOT NULL,
+    embedding       VECTOR(384) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_policy_embeddings_vector
+    ON policy_embeddings USING ivfflat (embedding vector_cosine_ops)
+    WITH (lists = 10);

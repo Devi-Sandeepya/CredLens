@@ -18,6 +18,8 @@ from .config import (
 )
 
 from .explain import explain_row
+from .policy_retrieval import retrieve_policy_chunks, build_query_from_decision
+from .llm_explanation import generate_explanation
 
 
 # ============================================================
@@ -839,6 +841,53 @@ def explanation_factors(
             "evidence signals and do not directly "
             "determine the decision."
         ),
+    }
+
+
+# ============================================================
+# POLICY-GROUNDED EXPLANATION (RAG)
+# ============================================================
+
+@app.get(
+    "/api/v1/applicants/{applicant_id}/policy-context"
+)
+def policy_context(
+    applicant_id: int,
+):
+    """
+    Retrieve the most relevant policy document chunks for this
+    applicant's current decision via pgvector semantic search,
+    then generate a policy-grounded natural-language explanation.
+
+    The LLM does not decide anything here — it only explains a
+    decision that has already been made by the deterministic
+    Policy Engine, grounded strictly in the retrieved policy text.
+    """
+
+    result = make_prediction(applicant_id)
+
+    query = build_query_from_decision(
+        decision=result["decision"],
+        integrity_status=result["integrityStatus"],
+        risk_score=result["riskScore"],
+    )
+
+    chunks = retrieve_policy_chunks(query, top_k=3)
+
+    explanation = generate_explanation(
+        decision=result["decision"],
+        risk_score=result["riskScore"],
+        confidence=result["confidence"],
+        integrity_status=result["integrityStatus"],
+        policy_chunks=chunks,
+    )
+
+    return {
+        "applicantId": applicant_id,
+        "decision": result["decision"],
+        "retrievalQuery": query,
+        "retrievedPolicy": chunks,
+        "aiExplanation": explanation,
     }
 
 
