@@ -144,6 +144,9 @@ function App() {
       <div className="layout">
         <aside className="rail">
           <div className="railLabel">Audit Rail</div>
+          {decision?.decisionId && (
+            <RailRow label="Decision ID" value={decision.decisionId} />
+          )}
           <RailRow label="Applicant" value={decision ? `#${decision.applicantId}` : "—"} />
           <RailRow label="Model" value={decision?.modelVersion || "—"} />
           <RailRow label="Policy" value={decision?.policyVersion || "—"} />
@@ -388,8 +391,20 @@ function App() {
                 <section className="panel">
                   <div className="panelHead">
                     <h2>Decision Audit Trail</h2>
+                    {decision.decisionId && (
+                      <span className="badge muted">{decision.decisionId}</span>
+                    )}
                   </div>
                   <div className="auditGrid">
+                    <RailRow label="Decision ID" value={decision.decisionId || "—"} />
+                    <RailRow
+                      label="Persisted at"
+                      value={
+                        decision.persistedAt
+                          ? new Date(decision.persistedAt).toLocaleString()
+                          : "—"
+                      }
+                    />
                     <RailRow label="Applicant" value={`#${decision.applicantId}`} />
                     <RailRow label="Risk model" value={decision.modelVersion} />
                     <RailRow label="Policy" value={decision.policyVersion} />
@@ -400,9 +415,8 @@ function App() {
                     <RailRow label="Decision" value={decision.decision} />
                   </div>
                   <p className="auditNote">
-                    Decision ID and persisted timestamp are assigned once every
-                    decision is written to PostgreSQL (next task) — this trail
-                    currently reflects live inference only.
+                    Every decision is written to PostgreSQL with a unique Decision
+                    ID, making it fully reproducible and auditable after the fact.
                   </p>
                 </section>
               )}
