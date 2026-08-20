@@ -50,6 +50,7 @@ function App() {
   const [timeline, setTimeline] = useState(null);
   const [factors, setFactors] = useState([]);
   const [modelFactors, setModelFactors] = useState(null);
+  const [aiExplanation, setAiExplanation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [tab, setTab] = useState("Overview");
@@ -70,16 +71,21 @@ function App() {
       const data = await res.json();
       setDecision(data);
 
-      const [t, f] = await Promise.all([
+      const [t, f, p] = await Promise.all([
         fetch(`http://localhost:8001/api/v1/applicants/${targetId}/timeline`),
         fetch(
           `http://localhost:8001/api/v1/applicants/${targetId}/explanation-factors`
+        ),
+        fetch(
+          `http://localhost:8001/api/v1/applicants/${targetId}/policy-context`
         ),
       ]);
       setTimeline(await t.json());
       const explanationData = await f.json();
       setFactors(explanationData.contextualFactors || []);
       setModelFactors(explanationData.modelExplanation || null);
+      const policyData = await p.json();
+      setAiExplanation(policyData.aiExplanation || null);
     } catch (e) {
       alert(
         "Could not load applicant. Make sure ML service, backend and data/model are running."
@@ -384,6 +390,26 @@ function App() {
                       <FactorRow key={i} text={f.factor} direction={f.direction} />
                     ))}
                   </div>
+
+                  {aiExplanation && (
+                    <div className="factorGroup aiExplanationBox">
+                      <div className="factorGroupLabel">
+                        AI Explanation
+                        <span className={`aiSourceTag ${aiExplanation.source}`}>
+                          {aiExplanation.source === "llm"
+                            ? `Groq · ${aiExplanation.model}`
+                            : "Fallback"}
+                        </span>
+                      </div>
+                      <p className="aiExplanationText">{aiExplanation.explanation}</p>
+                      <p className="aiExplanationNote">
+                        Grounded in retrieved policy text via pgvector semantic
+                        search. This explanation does not influence the decision —
+                        it is generated after the deterministic Policy Engine
+                        has already decided.
+                      </p>
+                    </div>
+                  )}
                 </section>
               )}
 

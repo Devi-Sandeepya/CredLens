@@ -700,3 +700,45 @@ h1 {
   padding-top: 12px;
   line-height: 1.5;
 }
+
+/* ---------------- AI EXPLANATION ---------------- */
+
+.aiExplanationBox {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eceff4;
+}
+
+.aiSourceTag {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.aiSourceTag.llm {
+  background: rgba(217, 179, 79, 0.16);
+  color: #8a6d1f;
+}
+
+.aiSourceTag.fallback {
+  background: #eef0f5;
+  color: var(--text-soft);
+}
+
+.aiExplanationText {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 10px 0 10px;
+}
+
+.aiExplanationNote {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin: 0;
+}
