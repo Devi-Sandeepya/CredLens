@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-const DEMO_ID = 100002;
+const DEMO_ID = "";
 
 const PERSONAS = [
   {
@@ -42,6 +42,18 @@ const LIMITATIONS = [
   "Human review remains necessary for REFER cases",
 ];
 
+function formatCurrency(value) {
+  if (value === undefined || value === null || isNaN(value)) return "—";
+  return "₹" + Math.round(value).toLocaleString("en-IN");
+}
+
+function formatEmployment(daysEmployed) {
+  if (daysEmployed === undefined || daysEmployed === null) return "—";
+  if (daysEmployed > 0) return "Not currently employed";
+  const years = Math.abs(daysEmployed) / 365;
+  return years < 1 ? `${Math.round(years * 12)} months` : `${years.toFixed(1)} years`;
+}
+
 function App() {
   const [id, setId] = useState(DEMO_ID);
   const [decision, setDecision] = useState(null);
@@ -51,6 +63,7 @@ function App() {
   const [factors, setFactors] = useState([]);
   const [modelFactors, setModelFactors] = useState(null);
   const [aiExplanation, setAiExplanation] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [tab, setTab] = useState("Overview");
@@ -71,7 +84,7 @@ function App() {
       const data = await res.json();
       setDecision(data);
 
-      const [t, f, p] = await Promise.all([
+      const [t, f, p, feat] = await Promise.all([
         fetch(`http://localhost:8001/api/v1/applicants/${targetId}/timeline`),
         fetch(
           `http://localhost:8001/api/v1/applicants/${targetId}/explanation-factors`
@@ -79,6 +92,7 @@ function App() {
         fetch(
           `http://localhost:8001/api/v1/applicants/${targetId}/policy-context`
         ),
+        fetch(`http://localhost:8001/api/v1/applicants/${targetId}/features`),
       ]);
       setTimeline(await t.json());
       const explanationData = await f.json();
@@ -86,6 +100,8 @@ function App() {
       setModelFactors(explanationData.modelExplanation || null);
       const policyData = await p.json();
       setAiExplanation(policyData.aiExplanation || null);
+      const featureData = await feat.json();
+      setProfile(featureData.features || null);
     } catch (e) {
       alert(
         "Could not load applicant. Make sure ML service, backend and data/model are running."
@@ -144,7 +160,30 @@ function App() {
           Risk · Evidence Confidence · Behavioral Trajectory · Integrity
         </p>
 
-        <BeforeAfter />
+        <section className="toolbar heroToolbar">
+          <div className="manual">
+            <label>Applicant ID</label>
+            <input
+              value={id}
+              placeholder="Type an applicant ID…"
+              onChange={(e) => setId(e.target.value)}
+            />
+            <button
+              className="primaryBtn"
+              onClick={() => loadApplicant()}
+              disabled={loading || !id}
+            >
+              {loading ? "Loading…" : "Open Applicant 360"}
+            </button>
+          </div>
+        </section>
+
+        <BeforeAfter
+          decision={decision}
+          riskPct={riskPct}
+          confPct={confPct}
+          trend={timeline?.behaviorTrend}
+        />
       </header>
 
       <div className="layout">
@@ -196,48 +235,25 @@ function App() {
         </aside>
 
         <main>
-          <section className="personaGrid">
-            {PERSONAS.map((p) => (
-              <button
-                key={p.label}
-                className={`personaCard ${id === p.id ? "active" : ""}`}
-                disabled={loading}
-                onClick={() => {
-                  setId(p.id);
-                  loadApplicant(p.id);
-                }}
-              >
-                <div className="personaHead">
-                  <span className="personaName">{p.label}</span>
-                  <span
-                    className="personaOutcome"
-                    style={{ color: DECISION_COLOR[p.expected] }}
-                  >
-                    {p.expected}
-                  </span>
-                </div>
-                <p>{p.desc}</p>
-                <span className="personaId">#{p.id}</span>
-              </button>
-            ))}
-          </section>
-
-          <section className="toolbar">
-            <div className="manual">
-              <label>Applicant ID</label>
-              <input value={id} onChange={(e) => setId(e.target.value)} />
-              <button
-                className="primaryBtn"
-                onClick={() => loadApplicant()}
-                disabled={loading}
-              >
-                {loading ? "Loading…" : "Open Applicant 360"}
-              </button>
-            </div>
-          </section>
-
           {decision && (
             <>
+              {profile && (
+                <section className="profileStrip">
+                  <ProfileItem
+                    label="Income"
+                    value={formatCurrency(profile.AMT_INCOME_TOTAL)}
+                  />
+                  <ProfileItem
+                    label="Loan amount"
+                    value={formatCurrency(profile.AMT_CREDIT)}
+                  />
+                  <ProfileItem
+                    label="Employment"
+                    value={formatEmployment(profile.DAYS_EMPLOYED)}
+                  />
+                </section>
+              )}
+
               <section className="scoreRow">
                 <RiskGauge value={riskPct} color={decisionColor} />
                 <ConfidenceRing value={confPct} />
@@ -448,8 +464,43 @@ function App() {
               )}
             </>
           )}
+
+          <section className="personaGrid personaGridBottom">
+            {PERSONAS.map((p) => (
+              <button
+                key={p.label}
+                className={`personaCard ${id === p.id ? "active" : ""}`}
+                disabled={loading}
+                onClick={() => {
+                  setId(p.id);
+                  loadApplicant(p.id);
+                }}
+              >
+                <div className="personaHead">
+                  <span className="personaName">{p.label}</span>
+                  <span
+                    className="personaOutcome"
+                    style={{ color: DECISION_COLOR[p.expected] }}
+                  >
+                    {p.expected}
+                  </span>
+                </div>
+                <p>{p.desc}</p>
+                <span className="personaId">#{p.id}</span>
+              </button>
+            ))}
+          </section>
         </main>
       </div>
+    </div>
+  );
+}
+
+function ProfileItem({ label, value }) {
+  return (
+    <div className="profileItem">
+      <span className="profileLabel">{label}</span>
+      <b className="profileValue">{value}</b>
     </div>
   );
 }
@@ -542,7 +593,8 @@ function ConfidenceRing({ value }) {
   );
 }
 
-function BeforeAfter() {
+function BeforeAfter({ decision, riskPct, confPct, trend }) {
+  const live = !!decision;
   return (
     <div className="beforeAfter">
       <div className="baCol baTraditional">
@@ -557,13 +609,29 @@ function BeforeAfter() {
       </div>
       <div className="baDivider" />
       <div className="baCol baCredlens">
-        <span className="baLabel">CredLens</span>
-        <div className="baLine">Risk <b>34%</b></div>
-        <div className="baLine">Evidence Confidence <b>47%</b></div>
-        <div className="baLine">Trajectory <b>↑ Deteriorating</b></div>
-        <div className="baLine">Integrity <b>⚠ Unusual</b></div>
-        <div className="baLine">Decision <b>REFER</b></div>
-        <div className="baLine">Explanation <b>Available</b></div>
+        <span className="baLabel">
+          CredLens {live ? `· Applicant #${decision.applicantId} (live)` : "· Search an applicant ID above"}
+        </span>
+        <div className="baLine">
+          Risk <b>{live ? `${riskPct}%` : "—"}</b>
+        </div>
+        <div className="baLine">
+          Evidence Confidence <b>{live ? `${confPct}%` : "—"}</b>
+        </div>
+        <div className="baLine">
+          Trajectory <b>{live && trend ? trend : "—"}</b>
+        </div>
+        <div className="baLine">
+          Integrity{" "}
+          <b>{live ? (decision.integrityStatus === "UNUSUAL" ? "⚠ Unusual" : "✓ Normal") : "—"}</b>
+        </div>
+        <div className="baLine">
+          Decision{" "}
+          <b style={live ? { color: DECISION_COLOR[decision.decision] } : undefined}>
+            {live ? decision.decision : "—"}
+          </b>
+        </div>
+        <div className="baLine">Explanation <b>{live ? "Available" : "—"}</b></div>
       </div>
     </div>
   );

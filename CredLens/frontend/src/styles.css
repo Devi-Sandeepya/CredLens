@@ -142,9 +142,6 @@ h1 {
   font-family: var(--mono);
 }
 
-.baCredlens .baLine b {
-  color: var(--mint);
-}
 
 /* ---------------- LAYOUT ---------------- */
 
@@ -741,4 +738,47 @@ h1 {
   color: var(--text-soft);
   line-height: 1.5;
   margin: 0;
+}
+
+/* ---------------- PROFILE STRIP ---------------- */
+
+.profileStrip {
+  display: flex;
+  gap: 16px;
+  background: var(--paper-2);
+  border: 1px solid #e2e6ee;
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+}
+
+.profileItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.profileLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profileValue {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+
+.heroToolbar {
+  margin-bottom: 20px;
+  max-width: 780px;
+}
+
+.personaGridBottom {
+  margin-top: 32px;
+  margin-bottom: 0;
 }
