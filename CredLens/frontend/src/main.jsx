@@ -83,6 +83,18 @@ function App() {
   const [updating, setUpdating] = useState(false);
   const [tab, setTab] = useState("Overview");
 
+  const [user, setUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [authForm, setAuthForm] = useState({
+    username: "",
+    password: "",
+    fullName: "",
+    age: "",
+    role: "UNDERWRITER",
+  });
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
   async function loadApplicant(applicantId) {
     const targetId = applicantId ?? id;
     if (!targetId) return;
@@ -154,6 +166,50 @@ function App() {
     }
   }
 
+  async function handleAuth(e) {
+    e.preventDefault();
+    setAuthError("");
+    setAuthLoading(true);
+    try {
+      const endpoint = authMode === "login" ? "login" : "register";
+      const body =
+        authMode === "login"
+          ? { username: authForm.username, password: authForm.password }
+          : {
+              username: authForm.username,
+              password: authForm.password,
+              fullName: authForm.fullName,
+              age: authForm.age ? Number(authForm.age) : null,
+              role: authForm.role,
+            };
+      const res = await fetch(`/api/v1/auth/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAuthError(data.error || "Something went wrong");
+        return;
+      }
+      if (authMode === "register") {
+        setAuthMode("login");
+        setAuthForm({ ...authForm, password: "", fullName: "", age: "", role: "UNDERWRITER" });
+        setAuthError("Account created. Please log in.");
+      } else {
+        setUser(data);
+      }
+    } catch (err) {
+      setAuthError("Could not reach the server.");
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  function logout() {
+    setUser(null);
+  }
+
   const riskPct = decision ? Math.round(decision.riskScore * 100) : 0;
   const confPct = decision ? Math.round(decision.confidence) : 0;
   const decisionColor = decision
@@ -161,14 +217,125 @@ function App() {
     : "var(--ink-3)";
   const isLive = decision?.mode === "LIVE_BEHAVIOR_UPDATE";
 
+  if (!user) {
+    return (
+      <div className="authScreen">
+        <div className="authCard">
+          <span className="eyebrow">CREDLENS</span>
+          <h1 className="authTitle">Staff sign-in</h1>
+          <p className="authSub">
+            CredLens is an internal tool for bank underwriters and admins.
+            Applicants are never users of this system.
+          </p>
+
+          <div className="authTabs">
+            <button
+              className={authMode === "login" ? "authTab active" : "authTab"}
+              onClick={() => {
+                setAuthMode("login");
+                setAuthError("");
+              }}
+            >
+              Log in
+            </button>
+            <button
+              className={authMode === "register" ? "authTab active" : "authTab"}
+              onClick={() => {
+                setAuthMode("register");
+                setAuthError("");
+              }}
+            >
+              Register
+            </button>
+          </div>
+
+          <form onSubmit={handleAuth} className="authForm">
+            <label>Username</label>
+            <input
+              value={authForm.username}
+              onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
+              required
+            />
+
+            <label>Password</label>
+            <input
+              type="password"
+              value={authForm.password}
+              onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+              required
+            />
+
+            {authMode === "register" && (
+              <>
+                <label>Full name</label>
+                <input
+                  value={authForm.fullName}
+                  onChange={(e) => setAuthForm({ ...authForm, fullName: e.target.value })}
+                  required
+                />
+
+                <label>Age</label>
+                <input
+                  type="number"
+                  value={authForm.age}
+                  onChange={(e) => setAuthForm({ ...authForm, age: e.target.value })}
+                />
+
+                <label>Role</label>
+                <select
+                  value={authForm.role}
+                  onChange={(e) => setAuthForm({ ...authForm, role: e.target.value })}
+                >
+                  <option value="UNDERWRITER">Underwriter</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </>
+            )}
+
+            {authError && (
+              <p
+                className={`authError ${
+                  authMode === "login" && authError.includes("created") ? "success" : ""
+                }`}
+              >
+                {authError}
+              </p>
+            )}
+
+            <button className="primaryBtn authSubmit" disabled={authLoading}>
+              {authLoading
+                ? "Please wait…"
+                : authMode === "login"
+                ? "Log in"
+                : "Create account"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="hero">
         <div className="heroTop">
           <span className="eyebrow">CREDLENS</span>
-          <span className="protoBadge">
-            <i className="dot" /> Prototype
-          </span>
+          <div className="heroTopRight">
+            <span className="protoBadge">
+              <i className="dot" /> Prototype
+            </span>
+            <div className="userBadge">
+              <div className="userBadgeInfo">
+                <b>{user.fullName}</b>
+                <span>
+                  {user.role} · {user.age ? `${user.age} yrs` : "—"}
+                </span>
+              </div>
+              <button className="logoutBtn" onClick={logout}>
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
         <h1>Proactive, contextual credit decisioning</h1>
         <p className="sub">

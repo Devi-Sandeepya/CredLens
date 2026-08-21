@@ -820,3 +820,153 @@ h1 {
   color: var(--text);
   font-weight: 700;
 }
+
+/* ---------------- AUTH SCREEN ---------------- */
+
+.authScreen {
+  min-height: 100vh;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.authCard {
+  background: var(--ink-2);
+  border: 1px solid #2a3550;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.authTitle {
+  color: white;
+  font-family: var(--sans);
+  font-size: 26px;
+  font-weight: 800;
+  margin: 16px 0 8px;
+}
+
+.authSub {
+  color: var(--soft, #9aa4b8);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.authTabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #2a3550;
+}
+
+.authTab {
+  background: none;
+  border: none;
+  color: #9aa4b8;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 10px 4px;
+  margin-right: 20px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.authTab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.authForm label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #9aa4b8;
+  margin-top: 10px;
+}
+
+.authForm input,
+.authForm select {
+  font-family: var(--sans);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #3a4468;
+  background: var(--ink);
+  color: white;
+}
+
+.authError {
+  color: var(--coral);
+  font-size: 12.5px;
+  margin: 8px 0 0;
+}
+
+.authError.success {
+  color: var(--mint);
+}
+
+.authSubmit {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: var(--gold);
+  color: var(--ink);
+}
+
+/* ---------------- USER BADGE ---------------- */
+
+.heroTopRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 8px 6px 16px;
+}
+
+.userBadgeInfo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.userBadgeInfo b {
+  color: white;
+  font-size: 12.5px;
+}
+
+.userBadgeInfo span {
+  color: #9aa4b8;
+  font-size: 10.5px;
+  font-family: var(--mono);
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.authError.success { color: var(--mint); } to styles.css

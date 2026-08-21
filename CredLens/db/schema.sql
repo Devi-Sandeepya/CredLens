@@ -34,3 +34,13 @@ CREATE TABLE IF NOT EXISTS policy_embeddings (
 CREATE INDEX IF NOT EXISTS idx_policy_embeddings_vector
     ON policy_embeddings USING ivfflat (embedding vector_cosine_ops)
     WITH (lists = 10);
+
+CREATE TABLE IF NOT EXISTS users (
+    id              BIGSERIAL PRIMARY KEY,
+    username        VARCHAR(64) NOT NULL UNIQUE,
+    password_hash   VARCHAR(255) NOT NULL,
+    full_name       VARCHAR(128) NOT NULL,
+    age             INT,
+    role            VARCHAR(32) NOT NULL DEFAULT 'UNDERWRITER',
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
