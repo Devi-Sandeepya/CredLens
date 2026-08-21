@@ -54,6 +54,21 @@ function formatEmployment(daysEmployed) {
   return years < 1 ? `${Math.round(years * 12)} months` : `${years.toFixed(1)} years`;
 }
 
+function formatAge(daysBirth) {
+  if (daysBirth === undefined || daysBirth === null) return "—";
+  return Math.floor(Math.abs(daysBirth) / 365) + " years";
+}
+
+function formatGender(code) {
+  if (!code) return "—";
+  return code === "M" ? "Male" : code === "F" ? "Female" : code;
+}
+
+function formatText(value) {
+  if (value === undefined || value === null || value === "") return "—";
+  return String(value).replace(/_/g, " ");
+}
+
 function App() {
   const [id, setId] = useState(DEMO_ID);
   const [decision, setDecision] = useState(null);
@@ -238,19 +253,49 @@ function App() {
           {decision && (
             <>
               {profile && (
-                <section className="profileStrip">
-                  <ProfileItem
-                    label="Income"
-                    value={formatCurrency(profile.AMT_INCOME_TOTAL)}
-                  />
-                  <ProfileItem
-                    label="Loan amount"
-                    value={formatCurrency(profile.AMT_CREDIT)}
-                  />
-                  <ProfileItem
-                    label="Employment"
-                    value={formatEmployment(profile.DAYS_EMPLOYED)}
-                  />
+                <section className="panel profilePanel">
+                  <div className="panelHead">
+                    <h2>Applicant Profile</h2>
+                    <span className="badge muted">
+                      <i className="dot" /> FROM APPLICATION DATA
+                    </span>
+                  </div>
+                  <div className="profileGrid">
+                    <ProfileCard label="Age" value={formatAge(profile.DAYS_BIRTH)} />
+                    <ProfileCard label="Gender" value={formatGender(profile.CODE_GENDER)} />
+                    <ProfileCard
+                      label="Income"
+                      value={formatCurrency(profile.AMT_INCOME_TOTAL)}
+                    />
+                    <ProfileCard
+                      label="Loan amount"
+                      value={formatCurrency(profile.AMT_CREDIT)}
+                    />
+                    <ProfileCard
+                      label="Employment"
+                      value={formatEmployment(profile.DAYS_EMPLOYED)}
+                    />
+                    <ProfileCard
+                      label="Family status"
+                      value={formatText(profile.NAME_FAMILY_STATUS)}
+                    />
+                    <ProfileCard
+                      label="Education"
+                      value={formatText(profile.NAME_EDUCATION_TYPE)}
+                    />
+                    <ProfileCard
+                      label="Housing"
+                      value={formatText(profile.NAME_HOUSING_TYPE)}
+                    />
+                    <ProfileCard
+                      label="Children"
+                      value={
+                        profile.CNT_CHILDREN !== undefined
+                          ? String(profile.CNT_CHILDREN)
+                          : "—"
+                      }
+                    />
+                  </div>
                 </section>
               )}
 
@@ -496,11 +541,11 @@ function App() {
   );
 }
 
-function ProfileItem({ label, value }) {
+function ProfileCard({ label, value }) {
   return (
-    <div className="profileItem">
-      <span className="profileLabel">{label}</span>
-      <b className="profileValue">{value}</b>
+    <div className="profileCard">
+      <span className="profileCardLabel">{label}</span>
+      <b className="profileCardValue">{value}</b>
     </div>
   );
 }

@@ -782,3 +782,41 @@ h1 {
   margin-top: 32px;
   margin-bottom: 0;
 }
+
+.profileStrip {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+/* ---------------- PROFILE PANEL ---------------- */
+
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px;
+}
+
+.profileCard {
+  background: #f8f9fb;
+  border: 1px solid #e2e6ee;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profileCardLabel {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.profileCardValue {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 700;
+}
